@@ -1,0 +1,61 @@
+---
+title: "Generative Art Lab"
+author: "Chloe Feehan"
+format: 
+  html: 
+    self-contained: true
+    code-tools: true
+    code-fold: true
+    embed-resources: true
+editor: visual
+execute: 
+  echo: true
+  include: true
+  message: false
+  warning: false
+---
+
+```{r}
+#| label: libraries
+
+library(ggplot2)
+library(scales)
+library(ggthemes)
+library(tibble)
+```
+
+```{r}
+set.seed(1)
+n <- 50
+dat <- tibble(
+  x0 = runif(n),
+  y0 = runif(n),
+  x1 = x0 + runif(n, min = -.2, max = .2),
+  y1 = y0 + runif(n, min = -.2, max = .2),
+  shade = runif(n), 
+  size = runif(n)
+)
+
+
+pal <- c("darkslategray3", "aquamarine4", "cadetblue", "lightblue")
+
+
+dat |>
+  ggplot(aes(x = x0, y = y0,
+             xend = x1, yend = y1,
+             color = x0)) +
+  geom_segment(show.legend = FALSE, linewidth = 30) +
+  geom_point(show.legend = FALSE, size = 15, shape = 17, 
+             color = "green4") +
+  geom_point(show.legend = FALSE, size = 10, shape = 17, 
+             color = "springgreen3") +
+  geom_point(show.legend = FALSE, size = 6, shape = 17, 
+             color = "lightgreen") +
+  
+  #coord_polar() +
+  scale_y_continuous(expand = c(0, 0)) +
+  scale_x_continuous(expand = c(0, 0)) + 
+  scale_colour_gradientn(colours = pal) +
+  scale_size(range = c(0, 10)) +
+  theme_void()
+```
