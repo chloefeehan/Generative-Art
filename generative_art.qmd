@@ -1,0 +1,25 @@
+---
+title: "Generative Art Lab"
+author: "Chloe Feehan"
+format: 
+  html: 
+    self-contained: true
+    code-tools: true
+    code-fold: true
+    embed-resources: true
+editor: visual
+execute: 
+  echo: true
+  include: true
+  message: false
+  warning: false
+---
+
+```{r}
+#| label: libraries
+
+library(ggplot2)
+library(scales)
+library(ggthemes)
+library(tibble)
+```
