@@ -64,3 +64,40 @@ dat |>
                               face = "italic", color = "black")
   )
 ```
+
+```{r}
+
+
+
+# Define the number of points and the Golden Angle
+points <- 300
+angle <- pi * (3 - sqrt(5))
+
+# Generate the spiral points
+t <- (1:points) * angle
+x <- sin(t)
+y <- cos(t)
+df <- data.frame(t, x, y)
+
+# Plot the points in a spiral pattern
+p <- ggplot(df, aes(x * t, y * t, color = t))
+
+# Create a flower-like plot
+p + geom_point(aes(size = t), alpha = 0.8, shape = 16) +
+  scale_color_gradient(low = "yellow", high = "red") +  
+  scale_size(range = c(1, 9)) +  # 
+  theme(panel.background = element_rect(fill = "white"),
+        panel.grid = element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        legend.position = "none") +
+  ggtitle("Flower-like Spiral Plot")
+
+
+
+# source: https://art-from-code.netlify.app/day-1/session-3/
+# source: https://rpubs.com/Sergio_Garcia/phyllotaxis_r
+# source: https://ggplot2.tidyverse.org/reference/scale_gradient.html 
+
+```
