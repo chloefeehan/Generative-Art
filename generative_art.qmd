@@ -57,5 +57,10 @@ dat |>
   scale_x_continuous(expand = c(0, 0)) + 
   scale_colour_gradientn(colours = pal) +
   scale_size(range = c(0, 10)) +
-  theme_void()
+  theme_void() +
+  labs(title = "Forest") +
+  theme(
+    plot.title = element_text(family = "Times New Roman", size = 20, 
+                              face = "italic", color = "black")
+  )
 ```
