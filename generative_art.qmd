@@ -66,38 +66,33 @@ dat |>
 ```
 
 ```{r}
-
-
-
-# Define the number of points and the Golden Angle
-points <- 300
-angle <- pi * (3 - sqrt(5))
-
-# Generate the spiral points
-t <- (1:points) * angle
-x <- sin(t)
-y <- cos(t)
-df <- data.frame(t, x, y)
-
-# Plot the points in a spiral pattern
-p <- ggplot(df, aes(x * t, y * t, color = t))
-
-# Create a flower-like plot
-p + geom_point(aes(size = t), alpha = 0.8, shape = 16) +
-  scale_color_gradient(low = "yellow", high = "red") +  
-  scale_size(range = c(1, 9)) +  # 
-  theme(panel.background = element_rect(fill = "white"),
-        panel.grid = element_blank(),
-        axis.text = element_blank(),
-        axis.title = element_blank(),
-        axis.ticks = element_blank(),
-        legend.position = "none") +
-  ggtitle("Flower-like Spiral Plot")
-
-
-
 # source: https://art-from-code.netlify.app/day-1/session-3/
-# source: https://rpubs.com/Sergio_Garcia/phyllotaxis_r
-# source: https://ggplot2.tidyverse.org/reference/scale_gradient.html 
+show_polygon <- function(polygon, show_vertices = TRUE, ...) {
+  
+  pic <- ggplot(polygon, aes(x, y)) +
+    geom_polygon(colour = "black", fill = NA, show.legend = FALSE, ...) + 
+    coord_equal() + 
+    theme_void()
+  
+  if(show_vertices == TRUE) {
+    pic <- pic + geom_point(colour = "black", size = 2)
+  }
+  print(pic)
+}
+
+normalise_radius <- function(x, min, max) {
+  normalize(x, from = c(-0.5, 0.5), to = c(min, max))
+}
+```
+
+```{r}
+diamond <- tibble(
+  x = c(0.5, 1, 0.5, 0, 0.5),
+  y = c(0, 0.5, 1, 0.5, 0),
+  seg_len = c(1, 1, 1, 1, 0)
+)
+show_polygon(diamond)
+
+
 
 ```
