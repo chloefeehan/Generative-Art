@@ -22,6 +22,11 @@ library(ggplot2)
 library(scales)
 library(ggthemes)
 library(tibble)
+library(gganimate)
+library(tidyr)
+library(tidyverse)
+library(purrr)
+library(ggthemes)
 ```
 
 ```{r}
@@ -83,6 +88,11 @@ show_polygon <- function(polygon, show_vertices = TRUE, ...) {
 normalise_radius <- function(x, min, max) {
   normalize(x, from = c(-0.5, 0.5), to = c(min, max))
 }
+
+sample_canva <- function(seed = NULL) {
+  if(!is.null(seed)) set.seed(seed)
+  sample(ggthemes::canva_palettes, 1)[[1]]
+}
 ```
 
 ```{r}
@@ -94,5 +104,103 @@ diamond <- tibble(
 show_polygon(diamond)
 
 
+```
+
+```{r}
+# Base diamond shape
+diamond <- tibble(
+  x = c(0.5, 1, 0.5, 0, 0.5),
+  y = c(0, 0.5, 1, 0.5, 0)
+)
+
+# Function to create a single diamond shifted by x_shift and y_shift
+shift_diamond <- function(r_min, r_max, x_shift, y_shift, id) {
+  diamond %>%
+    mutate(
+      x = x + x_shift,
+      y = y + y_shift,
+      id = id
+    )
+}
+
+# Function to create a grid of diamonds
+diamond_grid <- function(nx = 10, ny = 6, seed = NULL) {
+  if(!is.null(seed)) set.seed(seed)
+  
+  diamond_settings <- expand_grid(
+    r_min = .3, 
+    r_max = .4, 
+    x_shift = 1:nx, 
+    y_shift = 1:ny
+  ) %>%
+    mutate(id = row_number())
+  
+  diamond_data <- pmap_dfr(diamond_settings, shift_diamond)
+  
+  diamond_data %>%
+    ggplot(aes(x, y, group = id, fill = as.factor(id))) +
+    geom_polygon(linewidth = 0, show.legend = FALSE) +
+    theme_void() +
+    coord_equal(xlim = c(0, nx + 1), ylim = c(0, ny + 1))
+}
+
+# Create and show the grid of diamonds
+grid <- diamond_grid(seed = 451)
+grid
 
 ```
+
+```{r}
+
+
+```
+
+```{r}
+
+# Base diamond shape
+diamond <- tibble(
+  x = c(0.5, 1, 0.5, 0, 0.5),
+  y = c(0, 0.5, 1, 0.5, 0)
+)
+
+# Function to create a single diamond shifted by x_shift and y_shift following a cosine wave
+wave_diamond <- function(r_min, r_max, x_shift, y_shift, id, frame) {
+  diamond %>%
+    mutate(
+      x = x + x_shift,
+      y = y + y_shift + cos(x_shift * 0.5 + frame * 0.1) * 0.5,
+      id = id,
+      frame = frame
+    )
+}
+
+# Function to create a grid of diamonds with animation following a cosine wave
+wave_diamond_grid <- function(nx = 10, ny = 6, nframes = 10, seed = NULL) {
+  if(!is.null(seed)) set.seed(seed)
+  
+  diamond_settings <- expand_grid(
+    r_min = .3, 
+    r_max = .4, 
+    x_shift = 1:nx, 
+    y_shift = 1:ny,
+    frame = 1:nframes
+  ) %>%
+    mutate(id = row_number() %% (nx * ny) + 1)
+  
+  diamond_data <- pmap_dfr(diamond_settings, wave_diamond)
+  
+  ggplot(diamond_data, aes(x, y, group = id, fill = as.factor(id))) +
+    geom_polygon(linewidth = 0, show.legend = FALSE) +
+    theme_void() +
+    coord_equal(xlim = c(0, nx + 1), ylim = c(0, ny + 1)) + 
+    transition_time(frame) +
+    ease_aes('linear')
+}
+
+# Create and animate the grid of diamonds following a cosine wave
+animated_plot <- wave_diamond_grid(nx = 10, ny = 6, nframes = 20, seed = 451)
+anim <- animate(animated_plot, nframes = 20, fps = 10, renderer = magick_renderer())
+anim
+
+```
+
