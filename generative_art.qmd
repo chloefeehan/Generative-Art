@@ -95,16 +95,6 @@ sample_canva <- function(seed = NULL) {
 }
 ```
 
-```{r}
-diamond <- tibble(
-  x = c(0.5, 1, 0.5, 0, 0.5),
-  y = c(0, 0.5, 1, 0.5, 0),
-  seg_len = c(1, 1, 1, 1, 0)
-)
-show_polygon(diamond)
-
-
-```
 
 ```{r}
 # Base diamond shape
@@ -135,72 +125,31 @@ diamond_grid <- function(nx = 10, ny = 6, seed = NULL) {
   ) %>%
     mutate(id = row_number())
   
+  # Iterating across each diamond
   diamond_data <- pmap_dfr(diamond_settings, shift_diamond)
   
+  # Building diamond Grid
   diamond_data %>%
     ggplot(aes(x, y, group = id, fill = as.factor(id))) +
     geom_polygon(linewidth = 0, show.legend = FALSE) +
     theme_void() +
-    coord_equal(xlim = c(0, nx + 1), ylim = c(0, ny + 1))
+    coord_equal(xlim = c(0, nx + 1), ylim = c(0, ny + 1)) +
+    transition_time(id) + 
+    shadow_mark() 
 }
 
 # Create and show the grid of diamonds
 grid <- diamond_grid(seed = 451)
 grid
 
+animate(grid, nframes = 100, fps = 10)
+
+#source for shadow_mark: https://stackoverflow.com/questions/63980842/transition-time-with-shadow-mark-for-only-one-geom-layer
+#source for gganimate: https://gganimate.com/
+# source: Chatgpt for getting diamond proportions correct and help create shift_diamond function
 ```
 
-```{r}
 
 
-```
 
-```{r}
-
-# Base diamond shape
-diamond <- tibble(
-  x = c(0.5, 1, 0.5, 0, 0.5),
-  y = c(0, 0.5, 1, 0.5, 0)
-)
-
-# Function to create a single diamond shifted by x_shift and y_shift following a cosine wave
-wave_diamond <- function(r_min, r_max, x_shift, y_shift, id, frame) {
-  diamond %>%
-    mutate(
-      x = x + x_shift,
-      y = y + y_shift + cos(x_shift * 0.5 + frame * 0.1) * 0.5,
-      id = id,
-      frame = frame
-    )
-}
-
-# Function to create a grid of diamonds with animation following a cosine wave
-wave_diamond_grid <- function(nx = 10, ny = 6, nframes = 10, seed = NULL) {
-  if(!is.null(seed)) set.seed(seed)
-  
-  diamond_settings <- expand_grid(
-    r_min = .3, 
-    r_max = .4, 
-    x_shift = 1:nx, 
-    y_shift = 1:ny,
-    frame = 1:nframes
-  ) %>%
-    mutate(id = row_number() %% (nx * ny) + 1)
-  
-  diamond_data <- pmap_dfr(diamond_settings, wave_diamond)
-  
-  ggplot(diamond_data, aes(x, y, group = id, fill = as.factor(id))) +
-    geom_polygon(linewidth = 0, show.legend = FALSE) +
-    theme_void() +
-    coord_equal(xlim = c(0, nx + 1), ylim = c(0, ny + 1)) + 
-    transition_time(frame) +
-    ease_aes('linear')
-}
-
-# Create and animate the grid of diamonds following a cosine wave
-animated_plot <- wave_diamond_grid(nx = 10, ny = 6, nframes = 20, seed = 451)
-anim <- animate(animated_plot, nframes = 20, fps = 10, renderer = magick_renderer())
-anim
-
-```
 
